@@ -1,4 +1,4 @@
-import FormData from 'form-data';
+import * as FormData from 'form-data';
 import APIClient, { RequestOptionsParams } from '../apiClient.js';
 import { Overrides } from '../config.js';
 import {
@@ -323,10 +323,13 @@ export class Messages extends Resource {
   static _buildFormRequest(
     requestBody: CreateDraftRequest | UpdateDraftRequest | SendMessageRequest
   ): FormData {
+    let form: FormData;
     // FormData imports are funky, cjs needs to use .default, es6 doesn't
-    const FD = require('form-data');
-    const FormDataConstructor = FD.default || FD;
-    const form: FormData = new FormDataConstructor();
+    if (typeof (FormData as any).default !== 'undefined') {
+      form = new (FormData as any).default();
+    } else {
+      form = new FormData();
+    }
 
     // Split out the message payload from the attachments
     const messagePayload = {
